@@ -3,11 +3,14 @@ package jeopardy.model
 /**
   * Possible rounds a category could be in
   */
+
+// $COVERAGE-OFF$ Disabling coverage until we actually use this case object
 case object CategoryRounds {
   val FIRST = "FIRST"
   val SECOND = "SECOND"
   val FINAL = "FINAL"
 }
+// $COVERAGE-ON$
 
 /**
   * Representation of a single category of Jeopardy questions

@@ -7,10 +7,11 @@ lazy val scalajhttp = "org.scalaj" %% "scalaj-http" % "2.3.0"
 
 lazy val commonSettings = Seq(
   scalaVersion := "2.12.7",
-  libraryDependencies := Seq(
+  libraryDependencies ++= Seq(
     scalatest,
     scalajhttp
-  )
+  ),
+  coverageExcludedPackages := ".*JeopardyMain.*"
 )
 
 lazy val root = (project in file("."))
