@@ -10,7 +10,7 @@ package jeopardy.model
   */
 case class JeopardyGame(
   id: String,
-  number: Int,
+  number: Option[Int],
   firstRound: JeopardyRound,
   secondRound: JeopardyRound,
   thirdRound: JeopardyRound

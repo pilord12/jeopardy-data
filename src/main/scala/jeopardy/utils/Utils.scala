@@ -8,7 +8,7 @@ import scala.util.matching.Regex
 object Utils {
   private val BASE_URL = "http://www.j-archive.com"
   private val BASE_GAME_URL = BASE_URL + "/showgame.php?game_id="
-  private val VALID_GAME_RE: Regex = """Show #\d+ - """.r
+  private val VALID_GAME_RE: Regex = """.*Show #(\d+) - .*""".r
 
   /**
     * Converts a numerical game ID to a URL for requesting info for that game
@@ -24,5 +24,20 @@ object Utils {
     */
   def checkValidGameResponseHtml(htmlString: String): Boolean = {
     VALID_GAME_RE.findFirstMatchIn(htmlString).isDefined
+  }
+
+  def parseGameNumberFromTitleString(title: String): Option[String] = {
+    title match {
+      case VALID_GAME_RE(showNum) => Some(showNum)
+      case _ => None
+    }
+  }
+
+  def intOrNone(str: String): Option[Int] = {
+    try {
+      Some(str.toInt)
+    } catch {
+      case e: NumberFormatException => None
+    }
   }
 }
