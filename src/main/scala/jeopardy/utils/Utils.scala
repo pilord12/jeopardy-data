@@ -26,6 +26,11 @@ object Utils {
     VALID_GAME_RE.findFirstMatchIn(htmlString).isDefined
   }
 
+  /**
+    * Gets the game number (ID) from the title string
+    * @param title the string of the title info of the show, as pulled from the HTML
+    * @return the string of the show's number, if it is found
+    */
   def parseGameNumberFromTitleString(title: String): Option[String] = {
     title match {
       case VALID_GAME_RE(showNum) => Some(showNum)
@@ -33,6 +38,11 @@ object Utils {
     }
   }
 
+  /**
+    * Attempts to parse an integer from a string
+    * @param str the string to parse
+    * @return the int parsed, or None if no int was parsed
+    */
   def intOrNone(str: String): Option[Int] = {
     try {
       Some(str.toInt)

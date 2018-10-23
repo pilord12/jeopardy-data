@@ -8,8 +8,8 @@ package jeopardy.model
   * @param isWager whether the clue requires a wager on the contestant's part; true for Daily Double and Final Jeopardy questions
   */
 case class JeopardyQuestion(
-  clue: String, // TODO add support for multimedia clues
-  correctAnswer: String,
+  clue: Option[String], // TODO add support for multimedia clues
+  correctAnswer: Option[String],
   dollarValue: Option[Int],
   isWager: Boolean = false
 )
