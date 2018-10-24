@@ -17,16 +17,10 @@ object ParsingConstants {
   val CLUE_TEXT_SELECTOR: String = "td.clue_text"
   val CLUE_ANSWER_SELECTOR: String = "tr > td > div"
   val CLUE_ANSWER_ATTRIBUTE: String = "onmouseover"
+  val CLUE_DOLLAR_VALUE_SELECTOR: String = "td.clue_value"
 
   val CATEGORIES_PER_ROUND: Int = 6
 
   val CLUE_ANSWER_RE: Regex = """.*<em class="correct_response">(?:<[a-zA-Z]+>)?([^<]*)(?:</[a-zA-Z]+>)?</em>.*""".r
-
-  /**
-    * Builds a selector for a clue from a column and row
-    * @param col the column in the clue table
-    * @param row the row in the clue table
-    * @return a string for selecting the clue text of that column/row
-    */
-  def firstRoundClueSelector(col: Int, row: Int): String = s"td#clue_J_${col}_$row"
+  val DOLLAR_AMOUNT_RE: Regex = """\$(\d+)""".r
 }

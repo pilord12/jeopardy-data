@@ -103,10 +103,19 @@ class GameParser(html: String) {
       answerRegexMatch
     }
 
+    val valueTextOpt = htmlElement >?> text(CLUE_DOLLAR_VALUE_SELECTOR)
+    val value = valueTextOpt.flatMap { dollarText =>
+      println(dollarText)
+      dollarText match {
+        case DOLLAR_AMOUNT_RE(number) => intOrNone(number)
+        case _ => None
+      }
+    }
+
     JeopardyQuestion(
       clue = clueTextOpt,
       correctAnswer = answerOpt,
-      dollarValue = None,
+      dollarValue = value,
       isWager = false
     )
   }
