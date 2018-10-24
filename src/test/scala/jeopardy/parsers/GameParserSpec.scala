@@ -22,7 +22,7 @@ class GameParserSpec extends WordSpec with Matchers {
 
       val testQuestion = testCategory.questions(0)
       testQuestion.clue shouldBe Some("\"The Princes of Ireland\" is vol. 1 of Edward Rutherfurd's \"Saga\" named for this capital")
-
+      testQuestion.correctAnswer shouldBe Some("Dublin")
     }
   }
 }

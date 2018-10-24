@@ -1,5 +1,7 @@
 package jeopardy.parsers
 
+import scala.util.matching.Regex
+
 /**
   * Constants useful for selecting and parsing HTML
   */
@@ -14,8 +16,11 @@ object ParsingConstants {
 
   val CLUE_TEXT_SELECTOR: String = "td.clue_text"
   val CLUE_ANSWER_SELECTOR: String = "tr > td > div"
+  val CLUE_ANSWER_ATTRIBUTE: String = "onmouseover"
 
   val CATEGORIES_PER_ROUND: Int = 6
+
+  val CLUE_ANSWER_RE: Regex = """.*<em class="correct_response">(?:<[a-zA-Z]+>)?([^<]*)(?:</[a-zA-Z]+>)?</em>.*""".r
 
   /**
     * Builds a selector for a clue from a column and row

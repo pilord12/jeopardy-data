@@ -50,4 +50,13 @@ object Utils {
       case e: NumberFormatException => None
     }
   }
+
+  /**
+    * Removes backslashes (\) from the given string
+    * @param str the string to sanitize
+    * @return the string, minus any escape characters
+    */
+  def sanitizeString(str: String): String = {
+    str.replace("\\", "")
+  }
 }

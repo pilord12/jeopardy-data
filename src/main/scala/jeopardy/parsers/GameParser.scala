@@ -1,14 +1,14 @@
 package jeopardy.parsers
 
 import jeopardy.model._
-import jeopardy.utils.Utils.{ intOrNone, parseGameNumberFromTitleString }
+import jeopardy.utils.Utils.{intOrNone, parseGameNumberFromTitleString}
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.dsl.DSL.Parse._
 import net.ruippeixotog.scalascraper.model.Element
-
 import ParsingConstants._
+import jeopardy.utils.Utils
 
 /**
   * A parser which extracts information about a game from given HTML
@@ -88,14 +88,24 @@ class GameParser(html: String) {
     * @return a JeopardyClue containing information about the clue outlined in the HTML
     */
   private def parseClue(htmlElement: Element): JeopardyQuestion = {
-    val clueText = htmlElement >?> text(CLUE_TEXT_SELECTOR)
-    val answerStuff = htmlElement >?> element(CLUE_ANSWER_SELECTOR)
+    val clueTextOpt = htmlElement >?> text(CLUE_TEXT_SELECTOR)
+    val answerElementOpt = htmlElement >?> element(CLUE_ANSWER_SELECTOR)
 
-    println(answerStuff.map(_.attr("onmouseover")))
+    val answerOpt = for {
+      answerElement <- answerElementOpt
+      if answerElement.hasAttr(CLUE_ANSWER_ATTRIBUTE)
+      answerElementMouseover = answerElement.attr(CLUE_ANSWER_ATTRIBUTE)
+      answerRegexMatch <- answerElementMouseover match {
+        case CLUE_ANSWER_RE(answer) => Some(Utils.sanitizeString(answer))
+        case _ => None
+      }
+    } yield {
+      answerRegexMatch
+    }
 
     JeopardyQuestion(
-      clue = clueText,
-      correctAnswer = None,
+      clue = clueTextOpt,
+      correctAnswer = answerOpt,
       dollarValue = None,
       isWager = false
     )
