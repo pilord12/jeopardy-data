@@ -7,7 +7,7 @@ package jeopardy.model
   */
 case class JeopardyCategory(
   title: String,
-  questions: List[JeopardyQuestion]
+  questions: Vector[JeopardyQuestion]
 )
 
 object JeopardyCategory {

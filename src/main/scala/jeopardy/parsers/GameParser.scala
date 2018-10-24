@@ -2,12 +2,13 @@ package jeopardy.parsers
 
 import jeopardy.model._
 import jeopardy.utils.Utils.{ intOrNone, parseGameNumberFromTitleString }
+import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
 import net.ruippeixotog.scalascraper.dsl.DSL.Parse._
-import net.ruippeixotog.scalascraper.browser.JsoupBrowser
+import net.ruippeixotog.scalascraper.model.Element
 
-import ParsingSelectors._
+import ParsingConstants._
 
 /**
   * A parser which extracts information about a game from given HTML
@@ -34,11 +35,11 @@ class GameParser(html: String) {
         firstRound = parseRound,
         secondRound = JeopardyRound(
           round = None,
-          categories = List.empty[JeopardyCategory]
+          categories = Vector.empty[JeopardyCategory]
         ),
         thirdRound = JeopardyRound(
           round = None,
-          categories = List.empty[JeopardyCategory]
+          categories = Vector.empty[JeopardyCategory]
         )
       )
     }
@@ -51,31 +52,46 @@ class GameParser(html: String) {
   private def parseRound: JeopardyRound = {
     val categoryNamesOpt = doc >?> texts(FIRST_ROUND_CATEGORIES_SELECTOR)
 
-    val categoriesWithNames = for {
+    val clueElements = doc >?> elements(FIRST_ROUND_CLUES_SELECTOR)
+    val groupedClueElementsOpt = clueElements.map(_.zipWithIndex.groupBy { case (_, i) =>
+      i % CATEGORIES_PER_ROUND // Since we need to reverse rows/columns, group by their position in the row
+    }.toVector.sortBy { case (colPos, _) => // Sort by their column number
+      colPos
+    }.map { case (_, column) =>
+      column.map { case (clueHtml, _) => // Grab the clue HTML and not the index
+        clueHtml
+      }
+    }) // We are left with a list of lists of clue HTML, in order from left-to-right by column
+
+    val categories = for {
       categoryNames <- categoryNamesOpt.toVector
-      (categoryName, columnIndex) <- categoryNames.toVector.zipWithIndex
-      questions = (1 to 5).map(parseClue(columnIndex + 1, _)) // the HTML is 1-indexed
+      groupedClueElements <- groupedClueElementsOpt.toVector
+      zippedNamesAndClues = categoryNames.zip(groupedClueElements)
+      (categoryName, categoryCluesHtml) <- zippedNamesAndClues
+      categoryQuestions = categoryCluesHtml.map(parseClue).toVector
     } yield {
       JeopardyCategory(
         title = categoryName.toUpperCase,
-        questions = questions.toList
+        questions = categoryQuestions
       )
     }
 
     JeopardyRound(
       round = Some(CategoryRounds.FIRST),
-      categories = categoriesWithNames.toList
+      categories = categories
     )
   }
 
   /**
-    * Parses information about a particular clue, given a column and a row value indicating the clue's position on the board
-    * @param col the clue's column
-    * @param row the clue's row
-    * @return a JeopardyClue containing information about the clue at the specified location
+    * Parses information about a particular clue, given some HTML from the board
+    * @param htmlElement the HTML for the full table cell of the clue
+    * @return a JeopardyClue containing information about the clue outlined in the HTML
     */
-  private def parseClue(col: Int, row: Int): JeopardyQuestion = {
-    val clueText = doc >?> text(firstRoundClueSelector(col, row))
+  private def parseClue(htmlElement: Element): JeopardyQuestion = {
+    val clueText = htmlElement >?> text(CLUE_TEXT_SELECTOR)
+    val answerStuff = htmlElement >?> element(CLUE_ANSWER_SELECTOR)
+
+    println(answerStuff.map(_.attr("onmouseover")))
 
     JeopardyQuestion(
       clue = clueText,

@@ -17,7 +17,7 @@ case object CategoryRounds {
   */
 case class JeopardyRound(
   round: Option[String],
-  categories: List[JeopardyCategory]
+  categories: Vector[JeopardyCategory]
 ) {
 
 }

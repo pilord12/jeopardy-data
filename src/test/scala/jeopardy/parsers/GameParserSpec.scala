@@ -16,7 +16,7 @@ class GameParserSpec extends WordSpec with Matchers {
       res.firstRound.round shouldBe Some(CategoryRounds.FIRST)
       res.firstRound.categories.length shouldBe 6
 
-      val testCategory = res.firstRound.categories.find(_.title == "RECENT FICTION").get
+      val testCategory = res.firstRound.categories(0)
       testCategory.title shouldBe "RECENT FICTION"
       testCategory.questions.length shouldBe 5
 
