@@ -58,8 +58,8 @@ class GameParser(html: String) {
     }.toVector.sortBy { case (colPos, _) => // Sort by their column number
       colPos
     }.map { case (_, column) =>
-      column.map { case (clueHtml, _) => // Grab the clue HTML and not the index
-        clueHtml
+      column.zipWithIndex.map { case ((clueHtml, _), rowNum) => // Grab the clue HTML and not the index
+        (clueHtml, rowNum + 1) // Add 1 so it's 1-indexed and not 0-indexed
       }
     }) // We are left with a list of lists of clue HTML, in order from left-to-right by column
 
@@ -68,7 +68,9 @@ class GameParser(html: String) {
       groupedClueElements <- groupedClueElementsOpt.toVector
       zippedNamesAndClues = categoryNames.zip(groupedClueElements)
       (categoryName, categoryCluesHtml) <- zippedNamesAndClues
-      categoryQuestions = categoryCluesHtml.map(parseClue).toVector
+      categoryQuestions = categoryCluesHtml.map { case (htmlElement, row) =>
+        parseClue(htmlElement, row)
+      }.toVector
     } yield {
       JeopardyCategory(
         title = categoryName.toUpperCase,
@@ -77,7 +79,7 @@ class GameParser(html: String) {
     }
 
     JeopardyRound(
-      round = Some(CategoryRounds.FIRST),
+      round = Some(JeopardyRounds.FIRST),
       categories = categories
     )
   }
@@ -85,9 +87,10 @@ class GameParser(html: String) {
   /**
     * Parses information about a particular clue, given some HTML from the board
     * @param htmlElement the HTML for the full table cell of the clue
+    * @param rowNum the number of the row, for purposes of calculating dollar amount
     * @return a JeopardyClue containing information about the clue outlined in the HTML
     */
-  private def parseClue(htmlElement: Element): JeopardyQuestion = {
+  private def parseClue(htmlElement: Element, rowNum: Int): JeopardyQuestion = {
     val clueTextOpt = htmlElement >?> text(CLUE_TEXT_SELECTOR)
     val answerElementOpt = htmlElement >?> element(CLUE_ANSWER_SELECTOR)
 
@@ -103,14 +106,7 @@ class GameParser(html: String) {
       answerRegexMatch
     }
 
-    val valueTextOpt = htmlElement >?> text(CLUE_DOLLAR_VALUE_SELECTOR)
-    val value = valueTextOpt.flatMap { dollarText =>
-      println(dollarText)
-      dollarText match {
-        case DOLLAR_AMOUNT_RE(number) => intOrNone(number)
-        case _ => None
-      }
-    }
+    val value = JeopardyRounds.rowToDollarAmount(roundNum = 1, rowNum = rowNum)
 
     JeopardyQuestion(
       clue = clueTextOpt,
