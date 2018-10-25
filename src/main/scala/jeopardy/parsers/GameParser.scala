@@ -108,11 +108,13 @@ class GameParser(html: String) {
 
     val value = JeopardyRounds.rowToDollarAmount(roundNum = 1, rowNum = rowNum)
 
+    val isWager = (htmlElement >?> element(DAILY_DOUBLE_SELECTOR)).isDefined
+
     JeopardyQuestion(
       clue = clueTextOpt,
       correctAnswer = answerOpt,
       dollarValue = value,
-      isWager = false
+      isWager = isWager
     )
   }
 }

@@ -30,6 +30,7 @@ class GameParserSpec extends WordSpec with Matchers {
       dailyDoubleTestQuestion.clue shouldBe Some("Wham's hit \"Wake Me Up Before You Go-Go\" mentions this American dance of the 1930s & '40s")
       dailyDoubleTestQuestion.correctAnswer shouldBe Some("the jitterbug")
       dailyDoubleTestQuestion.dollarValue shouldBe Some(800)
+      dailyDoubleTestQuestion.isWager shouldBe true
     }
   }
 }

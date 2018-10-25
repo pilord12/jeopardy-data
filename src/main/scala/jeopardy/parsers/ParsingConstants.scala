@@ -17,6 +17,7 @@ object ParsingConstants {
   val CLUE_TEXT_SELECTOR: String = "td.clue_text"
   val CLUE_ANSWER_SELECTOR: String = "tr > td > div"
   val CLUE_ANSWER_ATTRIBUTE: String = "onmouseover"
+  val DAILY_DOUBLE_SELECTOR: String = "td.clue_value_daily_double"
 
   val CATEGORIES_PER_ROUND: Int = 6
 
