@@ -61,7 +61,7 @@ class GameParser(html: String) {
       column.zipWithIndex.map { case ((clueHtml, _), rowNum) => // Grab the clue HTML and not the index
         (clueHtml, rowNum + 1) // Add 1 so it's 1-indexed and not 0-indexed
       }
-    }) // We are left with a list of lists of clue HTML, in order from left-to-right by column
+    }) // We are left with a list of lists of clue HTML and row numbers, in order from left-to-right by column
 
     val categories = for {
       categoryNames <- categoryNamesOpt.toVector
