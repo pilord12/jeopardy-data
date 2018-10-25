@@ -32,11 +32,8 @@ class GameParser(html: String) {
       JeopardyGame(
         id = id,
         number = intOrNone(id),
-        firstRound = parseRound,
-        secondRound = JeopardyRound(
-          round = None,
-          categories = Vector.empty[JeopardyCategory]
-        ),
+        firstRound = parseRound(JeopardyRounds.FIRST),
+        secondRound = parseRound(JeopardyRounds.SECOND),
         thirdRound = JeopardyRound(
           round = None,
           categories = Vector.empty[JeopardyCategory]
@@ -49,10 +46,12 @@ class GameParser(html: String) {
     * Parses a single round of Jeopardy information
     * @return a JeopardyRound representing the round parsed
     */
-  private def parseRound: JeopardyRound = {
-    val categoryNamesOpt = doc >?> texts(FIRST_ROUND_CATEGORIES_SELECTOR)
+  private def parseRound(roundNum: Int): JeopardyRound = {
+    val selectors = selectorsForRound(roundNum)
 
-    val clueElements = doc >?> elements(FIRST_ROUND_CLUES_SELECTOR)
+    val categoryNamesOpt = selectors.flatMap(s => doc >?> texts(s.categoriesSelector))
+
+    val clueElements = selectors.flatMap(s => doc >?> elements(s.cluesSelector))
     val groupedClueElementsOpt = clueElements.map(_.zipWithIndex.groupBy { case (_, i) =>
       i % CATEGORIES_PER_ROUND // Since we need to reverse rows/columns, group by their position in the row
     }.toVector.sortBy { case (colPos, _) => // Sort by their column number
@@ -69,7 +68,7 @@ class GameParser(html: String) {
       zippedNamesAndClues = categoryNames.zip(groupedClueElements)
       (categoryName, categoryCluesHtml) <- zippedNamesAndClues
       categoryQuestions = categoryCluesHtml.map { case (htmlElement, row) =>
-        parseClue(htmlElement, row)
+        parseClue(htmlElement, row, roundNum)
       }.toVector
     } yield {
       JeopardyCategory(
@@ -79,7 +78,7 @@ class GameParser(html: String) {
     }
 
     JeopardyRound(
-      round = Some(JeopardyRounds.FIRST),
+      round = Some(roundNum),
       categories = categories
     )
   }
@@ -90,7 +89,7 @@ class GameParser(html: String) {
     * @param rowNum the number of the row, for purposes of calculating dollar amount
     * @return a JeopardyClue containing information about the clue outlined in the HTML
     */
-  private def parseClue(htmlElement: Element, rowNum: Int): JeopardyQuestion = {
+  private def parseClue(htmlElement: Element, rowNum: Int, roundNum: Int): JeopardyQuestion = {
     val clueTextOpt = htmlElement >?> text(CLUE_TEXT_SELECTOR)
     val answerElementOpt = htmlElement >?> element(CLUE_ANSWER_SELECTOR)
 
@@ -106,7 +105,7 @@ class GameParser(html: String) {
       answerRegexMatch
     }
 
-    val value = JeopardyRounds.rowToDollarAmount(roundNum = 1, rowNum = rowNum)
+    val value = JeopardyRounds.rowToDollarAmount(roundNum = roundNum, rowNum = rowNum)
 
     val isWager = (htmlElement >?> element(DAILY_DOUBLE_SELECTOR)).isDefined
 

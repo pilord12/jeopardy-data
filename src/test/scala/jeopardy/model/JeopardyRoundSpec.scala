@@ -1,6 +1,6 @@
 package jeopardy.model
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 
 class JeopardyRoundSpec extends WordSpec with Matchers {
   "JeopardyRound" should {

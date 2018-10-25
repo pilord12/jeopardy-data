@@ -31,6 +31,26 @@ class GameParserSpec extends WordSpec with Matchers {
       dailyDoubleTestQuestion.correctAnswer shouldBe Some("the jitterbug")
       dailyDoubleTestQuestion.dollarValue shouldBe Some(800)
       dailyDoubleTestQuestion.isWager shouldBe true
+
+      res.secondRound.round shouldBe Some(JeopardyRounds.SECOND)
+      res.firstRound.categories.length shouldBe 6
+
+      val testDoubleCategory = res.secondRound.categories(3)
+      testDoubleCategory.title shouldBe "GREAT MOMENTS IN HISTORY"
+      testDoubleCategory.questions.length shouldBe 5
+
+      val testDoubleQuestion = testDoubleCategory.questions(4)
+      testDoubleQuestion.clue shouldBe Some("Inspired by a glass of beer, Donald Glaser made this device in 1952 to track cosmic rays")
+      testDoubleQuestion.correctAnswer shouldBe Some("the bubble chamber")
+      testDoubleQuestion.dollarValue shouldBe Some(2000)
+      testDoubleQuestion.isWager shouldBe false
+
+      val dailyDoubleTestDoubleQuestion = res.secondRound.categories(2).questions(2)
+      dailyDoubleTestDoubleQuestion.clue shouldBe
+        Some("After being a 16th C. version of \"The Terminator\", the title guy buys the farm too at the end of this, Will's 1st tragedy")
+      dailyDoubleTestDoubleQuestion.correctAnswer shouldBe Some("Titus Andronicus")
+      dailyDoubleTestDoubleQuestion.dollarValue shouldBe Some(1200)
+      dailyDoubleTestDoubleQuestion.isWager shouldBe true
     }
   }
 }
