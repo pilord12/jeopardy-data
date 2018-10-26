@@ -6,7 +6,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class GameParserSpec extends WordSpec with Matchers {
   "GameParser" should {
-    "parse basic game information" in {
+    "parse a full valid Jeopardy game" in {
       val testParser = new GameParser(TestObjects.game12Html)
       val res = testParser.parse.get
 
@@ -65,6 +65,8 @@ class GameParserSpec extends WordSpec with Matchers {
       testFinalQuestion.correctAnswer shouldBe Some("Frances Folsom Cleveland")
       testFinalQuestion.dollarValue shouldBe None
       testFinalQuestion.isWager shouldBe true
+
+      res shouldBe TestObjects.expectedGame12Object
     }
   }
 }
