@@ -34,10 +34,7 @@ class GameParser(html: String) {
         number = intOrNone(id),
         firstRound = parseRound(JeopardyRounds.FIRST),
         secondRound = parseRound(JeopardyRounds.SECOND),
-        thirdRound = JeopardyRound(
-          round = None,
-          categories = Vector.empty[JeopardyCategory]
-        )
+        thirdRound = parseRound(JeopardyRounds.FINAL)
       )
     }
   }
@@ -51,7 +48,12 @@ class GameParser(html: String) {
 
     val categoryNamesOpt = selectors.flatMap(s => doc >?> texts(s.categoriesSelector))
 
-    val clueElements = selectors.flatMap(s => doc >?> elements(s.cluesSelector))
+    // Since there is only one category and clue in the final round, just use the whole round HTML since the answer is on the category, not the clue
+    val clueElements = if (roundNum == JeopardyRounds.FINAL) {
+      selectors.flatMap(s => doc >?> elements(s.roundSelector))
+    } else {
+      selectors.flatMap(s => doc >?> elements(s.cluesSelector))
+    }
     val groupedClueElementsOpt = clueElements.map(_.zipWithIndex.groupBy { case (_, i) =>
       i % CATEGORIES_PER_ROUND // Since we need to reverse rows/columns, group by their position in the row
     }.toVector.sortBy { case (colPos, _) => // Sort by their column number
@@ -97,8 +99,8 @@ class GameParser(html: String) {
       answerElement <- answerElementOpt
       if answerElement.hasAttr(CLUE_ANSWER_ATTRIBUTE)
       answerElementMouseover = answerElement.attr(CLUE_ANSWER_ATTRIBUTE)
-      answerRegexMatch <- answerElementMouseover match {
-        case CLUE_ANSWER_RE(answer) => Some(Utils.sanitizeString(answer))
+      answerRegexMatch <- Utils.sanitizeString(answerElementMouseover) match {
+        case CLUE_ANSWER_RE(answer) => Some(answer)
         case _ => None
       }
     } yield {
@@ -107,7 +109,7 @@ class GameParser(html: String) {
 
     val value = JeopardyRounds.rowToDollarAmount(roundNum = roundNum, rowNum = rowNum)
 
-    val isWager = (htmlElement >?> element(DAILY_DOUBLE_SELECTOR)).isDefined
+    val isWager = (htmlElement >?> element(DAILY_DOUBLE_SELECTOR)).isDefined || roundNum == JeopardyRounds.FINAL // The final round is always a wager
 
     JeopardyQuestion(
       clue = clueTextOpt,

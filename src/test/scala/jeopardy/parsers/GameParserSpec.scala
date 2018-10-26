@@ -51,6 +51,20 @@ class GameParserSpec extends WordSpec with Matchers {
       dailyDoubleTestDoubleQuestion.correctAnswer shouldBe Some("Titus Andronicus")
       dailyDoubleTestDoubleQuestion.dollarValue shouldBe Some(1200)
       dailyDoubleTestDoubleQuestion.isWager shouldBe true
+
+      res.thirdRound.round shouldBe Some(JeopardyRounds.FINAL)
+      res.thirdRound.categories.length shouldBe 1
+
+      val testFinalCategory = res.thirdRound.categories(0)
+      testFinalCategory.title shouldBe "FIRST LADIES"
+      testFinalCategory.questions.length shouldBe 1
+
+      val testFinalQuestion = testFinalCategory.questions(0)
+      testFinalQuestion.clue shouldBe
+        Some("She survived the President by 39 years & was married to an archaeology professor at the time of her own death in 1947")
+      testFinalQuestion.correctAnswer shouldBe Some("Frances Folsom Cleveland")
+      testFinalQuestion.dollarValue shouldBe None
+      testFinalQuestion.isWager shouldBe true
     }
   }
 }

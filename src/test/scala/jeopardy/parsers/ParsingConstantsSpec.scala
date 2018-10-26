@@ -7,6 +7,7 @@ class ParsingConstantsSpec extends WordSpec with Matchers {
     "get the correct selectors given a round number" in {
       ParsingConstants.selectorsForRound(1) shouldBe Some(ParsingConstants.FIRST_ROUND_SELECTORS)
       ParsingConstants.selectorsForRound(2) shouldBe Some(ParsingConstants.SECOND_ROUND_SELECTORS)
+      ParsingConstants.selectorsForRound(3) shouldBe Some(ParsingConstants.FINAL_ROUND_SELECTORS)
       ParsingConstants.selectorsForRound(0) shouldBe None
       ParsingConstants.selectorsForRound(12) shouldBe None
     }

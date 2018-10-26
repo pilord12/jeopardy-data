@@ -18,6 +18,10 @@ object ParsingConstants {
   val SECOND_ROUND_CATEGORIES_SELECTOR: String = s"$SECOND_ROUND_SELECTOR $CATEGORY_SELECTOR"
   val SECOND_ROUND_CLUES_SELECTOR: String = s"$SECOND_ROUND_SELECTOR $CLUE_SELECTOR"
 
+  val FINAL_ROUND_SELECTOR: String = "div#final_jeopardy_round"
+  val FINAL_ROUND_CATEGORIES_SELECTOR: String = s"$FINAL_ROUND_SELECTOR $CATEGORY_SELECTOR"
+  val FINAL_ROUND_CLUES_SELECTOR: String = s"$FINAL_ROUND_SELECTOR $CLUE_SELECTOR"
+
   val FIRST_ROUND_SELECTORS = RoundSelectors(
     roundSelector = FIRST_ROUND_SELECTOR,
     categoriesSelector = FIRST_ROUND_CATEGORIES_SELECTOR,
@@ -30,6 +34,12 @@ object ParsingConstants {
     cluesSelector = SECOND_ROUND_CLUES_SELECTOR
   )
 
+  val FINAL_ROUND_SELECTORS = RoundSelectors(
+    roundSelector = FINAL_ROUND_SELECTOR,
+    categoriesSelector = FINAL_ROUND_CATEGORIES_SELECTOR,
+    cluesSelector = FINAL_ROUND_CLUES_SELECTOR
+  )
+
   /**
     * Determines what selectors need to be used for the given round
     * @param roundNum the round to check for
@@ -39,6 +49,7 @@ object ParsingConstants {
     roundNum match {
       case 1 => Some(FIRST_ROUND_SELECTORS)
       case 2 => Some(SECOND_ROUND_SELECTORS)
+      case 3 => Some(FINAL_ROUND_SELECTORS)
       case _ => None
     }
   }
