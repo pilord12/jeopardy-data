@@ -1,7 +1,10 @@
 package jeopardy.model
 
+import java.time.Instant
+
 /**
   * Class to represent one game of Jeopardy
+ *
   * @param id string ID of the episode
   * @param number episode number; probably the same as the ID
   * @param firstRound "Jeopardy" round of the game
@@ -10,6 +13,7 @@ package jeopardy.model
   */
 case class JeopardyGame(
   id: String,
+  date: Option[Instant],
   number: Option[Int],
   firstRound: JeopardyRound,
   secondRound: JeopardyRound,

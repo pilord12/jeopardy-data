@@ -1,5 +1,7 @@
 package jeopardy.utils
 
+import java.time.ZoneId
+
 import jeopardy.TestObjects
 import jeopardy.utils.Utils._
 import org.scalatest.{Matchers, WordSpec}
@@ -34,6 +36,27 @@ class UtilsSpec extends WordSpec with Matchers {
       sanitizeString("different\\String") shouldBe "differentString"
       sanitizeString("\\different\\String\\") shouldBe "differentString"
       sanitizeString("different\\\\Strin\\g") shouldBe "differentString"
+    }
+
+    "parse dates of the expected format" in {
+      val date = dateOrNone("Tuesday, September 21, 2004").get.atZone(ZoneId.of("UTC")).toLocalDate
+
+      date.getMonthValue shouldBe 9
+      date.getDayOfMonth shouldBe 21
+      date.getYear shouldBe 2004
+    }
+
+    "gracefully fail when given an invalid date" in {
+      val instOpt = dateOrNone("definitely not a valid date string")
+      instOpt should not be defined
+    }
+
+    "parse the date from the title string" in {
+      val titleString = "Show #4607 - Tuesday, September 21, 2004"
+      val invalidTitleString = "Show Tuesday, September 21, 2004"
+
+      parseDateFromTitleString(titleString) shouldBe dateOrNone("Tuesday, September 21, 2004")
+      parseDateFromTitleString(invalidTitleString) shouldBe None
     }
   }
 }

@@ -1,18 +1,17 @@
 package jeopardy.parsers
 
 import jeopardy.model._
-import jeopardy.utils.Utils.{intOrNone, parseGameNumberFromTitleString}
+import jeopardy.utils.Utils.{intOrNone, parseGameNumberFromTitleString, parseDateFromTitleString}
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.ruippeixotog.scalascraper.dsl.DSL._
 import net.ruippeixotog.scalascraper.dsl.DSL.Extract._
-import net.ruippeixotog.scalascraper.dsl.DSL.Parse._
 import net.ruippeixotog.scalascraper.model.Element
 import ParsingConstants._
 import jeopardy.utils.Utils
 
 /**
   * A parser which extracts information about a game from given HTML
-  * @param html
+  * @param html the HTML string to parse information from
   */
 class GameParser(html: String) {
   private val browser = JsoupBrowser()
@@ -31,6 +30,7 @@ class GameParser(html: String) {
     } yield {
       JeopardyGame(
         id = id,
+        date = parseDateFromTitleString(title),
         number = intOrNone(id),
         firstRound = parseRound(JeopardyRounds.FIRST),
         secondRound = parseRound(JeopardyRounds.SECOND),

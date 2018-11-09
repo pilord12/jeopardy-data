@@ -1,6 +1,7 @@
 package jeopardy
 
 import jeopardy.model._
+import jeopardy.utils.Utils.dateOrNone
 
 import io.Source
 
@@ -17,195 +18,212 @@ object TestObjects {
 
   lazy val game12Html: String = Source.fromFile(gameFileFullPath("game12.html")).mkString
   lazy val invalidGameHtml: String = Source.fromFile(gameFileFullPath("invalid_game.html")).mkString
+  lazy val game12InvalidQ1Html: String = Source.fromFile(gameFileFullPath("game12_invalidq1.html")).mkString
 
-  lazy val expectedGame12Object = JeopardyGame(
+  private lazy val game12AlwaysValidCategories: Vector[JeopardyCategory] = Vector(
+    JeopardyCategory(
+      title = "BASEBALL ROOKIES OF THE YEAR",
+      questions = Vector(
+        JeopardyQuestion(
+          clue = Some("This center fielder who hit 660 homers & won 2 NL MVP awards started his pro career in the Negro Leagues"),
+          correctAnswer = Some("Mays"),
+          dollarValue = Some(200)
+        ),
+        JeopardyQuestion(
+          clue = Some("He was the first Japanese player in nearly 30 years to play in the majors when he pitched for the Dodgers in 1995"),
+          correctAnswer = Some("Nomo"),
+          dollarValue = Some(400)
+        ),
+        JeopardyQuestion(
+          clue = Some("This pitcher was Rookie of the Year in 1967; he won the Cy Young & a World Series ring in 1969"),
+          correctAnswer = Some("Seaver"),
+          dollarValue = Some(600)
+        ),
+        JeopardyQuestion(
+          clue = Some("1956's Rookie of the Year with Cincinnati, he was the first player to be MVP in both the AL & NL"),
+          correctAnswer = Some("Frank Robinson"),
+          dollarValue = Some(800)
+        ),
+        JeopardyQuestion(
+          clue = Some("Playing for the New York Mets, he was named the 1983 National League Rookie of the Year"),
+          correctAnswer = Some("Darryl Strawberry"),
+          dollarValue = Some(1000)
+        )
+      )
+    ),
+    JeopardyCategory(
+      title = "WAXING PHILOSOPHICAL",
+      questions = Vector(
+        JeopardyQuestion(
+          clue = Some("This philosopher & partner of Engels took up residence in London after being expelled from Prussia in 1849"),
+          correctAnswer = Some("Marx"),
+          dollarValue = Some(200)
+        ),
+        JeopardyQuestion(
+          clue = Some("Seen here, the death of this Athenian philosopher was immortalized by Jacques-Louis David in 1787"),
+          correctAnswer = Some("Socrates"),
+          dollarValue = Some(400)
+        ),
+        JeopardyQuestion(
+          clue = Some("This philosopher & Sartre convened an intl. war crimes tribunal to publicize U.S. atrocities in Vietnam"),
+          correctAnswer = Some("Bertrand Russell"),
+          dollarValue = Some(600)
+        ),
+        JeopardyQuestion(
+          clue = Some("In 1937 this U.S. educator headed an inquiry to hear Trotsky's rebuttal of the Moscow charges against him"),
+          correctAnswer = Some("John Dewey"),
+          dollarValue = Some(800)
+        ),
+        JeopardyQuestion(
+          clue = Some("This intellectual known for his concept of the absurd classifies rebels into world deniers and world affirmers"),
+          correctAnswer = Some("Albert Camus"),
+          dollarValue = Some(1000)
+        )
+      )
+    ),
+    JeopardyCategory(
+      title = "SWEET",
+      questions = Vector(
+        JeopardyQuestion(
+          clue = Some("Benjamin Eisenstadt introduced this pink-packeted product in 1957"),
+          correctAnswer = Some("Sweet'N Low"),
+          dollarValue = Some(200)
+        ),
+        JeopardyQuestion(
+          clue = Some("1 1997 song by The Verve says life is this type of symphony"),
+          correctAnswer = Some("a bittersweet symphony"),
+          dollarValue = Some(400)
+        ),
+        JeopardyQuestion(
+          clue = Some("They're the climbers seen here"),
+          correctAnswer = Some("sweet peas"),
+          dollarValue = Some(600)
+        ),
+        JeopardyQuestion(
+          clue = Some("This Texas city is the seat of Nolan County"),
+          correctAnswer = Some("Sweetwater"),
+          dollarValue = Some(800)
+        ),
+        JeopardyQuestion(
+          clue = Some("\"Albertine Disparue\", a volume in this epic work, is sometimes translated as \"The Sweet Cheat Gone\""),
+          correctAnswer = Some("Remembrance of Things Past"),
+          dollarValue = Some(1000)
+        )
+      )
+    ),
+    JeopardyCategory(
+      title = "BALLROOM BLITZ",
+      questions = Vector(
+        JeopardyQuestion(
+          clue = Some("The \"Virginia\" variety of this country dance starts with partners facing each other in 2 lines"),
+          correctAnswer = Some("the reel"),
+          dollarValue = Some(200)
+        ),
+        JeopardyQuestion(
+          clue = Some("A star was born when Rudolph Valentino did this Latin-American dance in \"Four Horsemen of the Apocalypse\""),
+          correctAnswer = Some("a tango"),
+          dollarValue = Some(400)
+        ),
+        JeopardyQuestion(
+          clue = Some("An 18th century dance & a social ball are both called this, from a French word for \"petticoat\""),
+          correctAnswer = Some("a cotillion"),
+          dollarValue = Some(600)
+        ),
+        JeopardyQuestion(
+          clue = Some("Wham's hit \"Wake Me Up Before You Go-Go\" mentions this American dance of the 1930s & '40s"),
+          correctAnswer = Some("the jitterbug"),
+          dollarValue = Some(800),
+          isWager = true
+        ),
+        JeopardyQuestion(
+          clue = Some("This ballroom dance may have been named for vaudeville comedian Harry"),
+          correctAnswer = Some("the foxtrot"),
+          dollarValue = Some(1000)
+        )
+      )
+    ),
+    JeopardyCategory(
+      title = "SILENT \"P\"",
+      questions = Vector(
+        JeopardyQuestion(
+          clue = Some("I'm somehow sensing you'll know this word for a medium, from the Greek for \"of the soul\""),
+          correctAnswer = Some("psychic"),
+          dollarValue = Some(200)
+        ),
+        JeopardyQuestion(
+          clue = Some("An extinct flying reptile from the Cretaceous Period, it had a wingspan of about 25 feet"),
+          correctAnswer = Some("a pteranodon"),
+          dollarValue = Some(400)
+        ),
+        JeopardyQuestion(
+          clue = Some("11-letter term describing the era of Jimi Hendrix & Timothy Leary"),
+          correctAnswer = Some("psychedelic (psychedelia accepted)"),
+          dollarValue = Some(600)
+        ),
+        JeopardyQuestion(
+          clue = Some("Any of several grouses of the genus Lagopus, having feathered feet"),
+          correctAnswer = Some("a ptarmigan"),
+          dollarValue = Some(800)
+        ),
+        JeopardyQuestion(
+          clue = Some("Also called parrot fever, it can be contracted by handling sick parrots, pigeons or poultry"),
+          correctAnswer = Some("psittacosis"),
+          dollarValue = Some(1000)
+        )
+      )
+    )
+
+  )
+
+  private lazy val game12AlwaysValidCat1Questions: Vector[JeopardyQuestion] = Vector(
+    JeopardyQuestion(
+      clue = Some("A song provided the title of this Michael Walsh novel featuring Isla Lund & Victor Laszlo"),
+      correctAnswer = Some("As Time Goes By"),
+      dollarValue = Some(400)
+    ),
+    JeopardyQuestion(
+      clue = Some("This term for a lawyer who pulls in profits provided the title of a John Grisham book"),
+      correctAnswer = Some("The Rainmaker"),
+      dollarValue = Some(600)
+    ),
+    JeopardyQuestion(
+      clue = Some("\"Empire\" is nonfiction by Niall Ferguson; this is Richard Russo's novel about small town man Miles Roby"),
+      correctAnswer = Some("Empire Falls"),
+      dollarValue = Some(800)
+    ),
+    JeopardyQuestion(
+      clue = Some("In a series set in Africa, a woman named Precious Ramotswe runs this crime-solving outfit"),
+      correctAnswer = Some("The No. 1 Ladies' Detective Agency"),
+      dollarValue = Some(1000)
+    )
+  )
+
+  private lazy val game12ValidCat1Question: JeopardyQuestion = JeopardyQuestion(
+    clue = Some("\"The Princes of Ireland\" is vol. 1 of Edward Rutherfurd's \"Saga\" named for this capital"),
+    correctAnswer = Some("Dublin"),
+    dollarValue = Some(200)
+  )
+
+  lazy val game12InvalidCat1Question: JeopardyQuestion = game12ValidCat1Question.copy(correctAnswer = None)
+
+  private lazy val game12ValidCat1: JeopardyCategory = JeopardyCategory(
+    title = "RECENT FICTION",
+    questions = game12ValidCat1Question +: game12AlwaysValidCat1Questions
+  )
+
+  private lazy val game12InvalidCat1: JeopardyCategory = game12ValidCat1.copy(questions = game12InvalidCat1Question +: game12AlwaysValidCat1Questions)
+
+  private lazy val game12ValidCategoriesRound1: Vector[JeopardyCategory] = game12ValidCat1 +: game12AlwaysValidCategories
+
+  private lazy val game12InvalidCategoriesRound1: Vector[JeopardyCategory] = game12InvalidCat1 +: game12AlwaysValidCategories
+
+  lazy val expectedGame12Object: JeopardyGame = JeopardyGame(
     id = "4607",
+    date = dateOrNone("Tuesday, September 21, 2004"),
     number = Some(4607),
     firstRound = JeopardyRound(
       round = Some(JeopardyRounds.FIRST),
-      categories = Vector(
-        JeopardyCategory(
-          title = "RECENT FICTION",
-          questions = Vector(
-            JeopardyQuestion(
-              clue = Some("\"The Princes of Ireland\" is vol. 1 of Edward Rutherfurd's \"Saga\" named for this capital"),
-              correctAnswer = Some("Dublin"),
-              dollarValue = Some(200)
-            ),
-            JeopardyQuestion(
-              clue = Some("A song provided the title of this Michael Walsh novel featuring Isla Lund & Victor Laszlo"),
-              correctAnswer = Some("As Time Goes By"),
-              dollarValue = Some(400)
-            ),
-            JeopardyQuestion(
-              clue = Some("This term for a lawyer who pulls in profits provided the title of a John Grisham book"),
-              correctAnswer = Some("The Rainmaker"),
-              dollarValue = Some(600)
-            ),
-            JeopardyQuestion(
-              clue = Some("\"Empire\" is nonfiction by Niall Ferguson; this is Richard Russo's novel about small town man Miles Roby"),
-              correctAnswer = Some("Empire Falls"),
-              dollarValue = Some(800)
-            ),
-            JeopardyQuestion(
-              clue = Some("In a series set in Africa, a woman named Precious Ramotswe runs this crime-solving outfit"),
-              correctAnswer = Some("The No. 1 Ladies' Detective Agency"),
-              dollarValue = Some(1000)
-            )
-          )
-        ),
-        JeopardyCategory(
-          title = "BASEBALL ROOKIES OF THE YEAR",
-          questions = Vector(
-            JeopardyQuestion(
-              clue = Some("This center fielder who hit 660 homers & won 2 NL MVP awards started his pro career in the Negro Leagues"),
-              correctAnswer = Some("Mays"),
-              dollarValue = Some(200)
-            ),
-            JeopardyQuestion(
-              clue = Some("He was the first Japanese player in nearly 30 years to play in the majors when he pitched for the Dodgers in 1995"),
-              correctAnswer = Some("Nomo"),
-              dollarValue = Some(400)
-            ),
-            JeopardyQuestion(
-              clue = Some("This pitcher was Rookie of the Year in 1967; he won the Cy Young & a World Series ring in 1969"),
-              correctAnswer = Some("Seaver"),
-              dollarValue = Some(600)
-            ),
-            JeopardyQuestion(
-              clue = Some("1956's Rookie of the Year with Cincinnati, he was the first player to be MVP in both the AL & NL"),
-              correctAnswer = Some("Frank Robinson"),
-              dollarValue = Some(800)
-            ),
-            JeopardyQuestion(
-              clue = Some("Playing for the New York Mets, he was named the 1983 National League Rookie of the Year"),
-              correctAnswer = Some("Darryl Strawberry"),
-              dollarValue = Some(1000)
-            )
-          )
-        ),
-        JeopardyCategory(
-          title = "WAXING PHILOSOPHICAL",
-          questions = Vector(
-            JeopardyQuestion(
-              clue = Some("This philosopher & partner of Engels took up residence in London after being expelled from Prussia in 1849"),
-              correctAnswer = Some("Marx"),
-              dollarValue = Some(200)
-            ),
-            JeopardyQuestion(
-              clue = Some("Seen here, the death of this Athenian philosopher was immortalized by Jacques-Louis David in 1787"),
-              correctAnswer = Some("Socrates"),
-              dollarValue = Some(400)
-            ),
-            JeopardyQuestion(
-              clue = Some("This philosopher & Sartre convened an intl. war crimes tribunal to publicize U.S. atrocities in Vietnam"),
-              correctAnswer = Some("Bertrand Russell"),
-              dollarValue = Some(600)
-            ),
-            JeopardyQuestion(
-              clue = Some("In 1937 this U.S. educator headed an inquiry to hear Trotsky's rebuttal of the Moscow charges against him"),
-              correctAnswer = Some("John Dewey"),
-              dollarValue = Some(800)
-            ),
-            JeopardyQuestion(
-              clue = Some("This intellectual known for his concept of the absurd classifies rebels into world deniers and world affirmers"),
-              correctAnswer = Some("Albert Camus"),
-              dollarValue = Some(1000)
-            )
-          )
-        ),
-        JeopardyCategory(
-          title = "SWEET",
-          questions = Vector(
-            JeopardyQuestion(
-              clue = Some("Benjamin Eisenstadt introduced this pink-packeted product in 1957"),
-              correctAnswer = Some("Sweet'N Low"),
-              dollarValue = Some(200)
-            ),
-            JeopardyQuestion(
-              clue = Some("1 1997 song by The Verve says life is this type of symphony"),
-              correctAnswer = Some("a bittersweet symphony"),
-              dollarValue = Some(400)
-            ),
-            JeopardyQuestion(
-              clue = Some("They're the climbers seen here"),
-              correctAnswer = Some("sweet peas"),
-              dollarValue = Some(600)
-            ),
-            JeopardyQuestion(
-              clue = Some("This Texas city is the seat of Nolan County"),
-              correctAnswer = Some("Sweetwater"),
-              dollarValue = Some(800)
-            ),
-            JeopardyQuestion(
-              clue = Some("\"Albertine Disparue\", a volume in this epic work, is sometimes translated as \"The Sweet Cheat Gone\""),
-              correctAnswer = Some("Remembrance of Things Past"),
-              dollarValue = Some(1000)
-            )
-          )
-        ),
-        JeopardyCategory(
-          title = "BALLROOM BLITZ",
-          questions = Vector(
-            JeopardyQuestion(
-              clue = Some("The \"Virginia\" variety of this country dance starts with partners facing each other in 2 lines"),
-              correctAnswer = Some("the reel"),
-              dollarValue = Some(200)
-            ),
-            JeopardyQuestion(
-              clue = Some("A star was born when Rudolph Valentino did this Latin-American dance in \"Four Horsemen of the Apocalypse\""),
-              correctAnswer = Some("a tango"),
-              dollarValue = Some(400)
-            ),
-            JeopardyQuestion(
-              clue = Some("An 18th century dance & a social ball are both called this, from a French word for \"petticoat\""),
-              correctAnswer = Some("a cotillion"),
-              dollarValue = Some(600)
-            ),
-            JeopardyQuestion(
-              clue = Some("Wham's hit \"Wake Me Up Before You Go-Go\" mentions this American dance of the 1930s & '40s"),
-              correctAnswer = Some("the jitterbug"),
-              dollarValue = Some(800),
-              isWager = true
-            ),
-            JeopardyQuestion(
-              clue = Some("This ballroom dance may have been named for vaudeville comedian Harry"),
-              correctAnswer = Some("the foxtrot"),
-              dollarValue = Some(1000)
-            )
-          )
-        ),
-        JeopardyCategory(
-          title = "SILENT \"P\"",
-          questions = Vector(
-            JeopardyQuestion(
-              clue = Some("I'm somehow sensing you'll know this word for a medium, from the Greek for \"of the soul\""),
-              correctAnswer = Some("psychic"),
-              dollarValue = Some(200)
-            ),
-            JeopardyQuestion(
-              clue = Some("An extinct flying reptile from the Cretaceous Period, it had a wingspan of about 25 feet"),
-              correctAnswer = Some("a pteranodon"),
-              dollarValue = Some(400)
-            ),
-            JeopardyQuestion(
-              clue = Some("11-letter term describing the era of Jimi Hendrix & Timothy Leary"),
-              correctAnswer = Some("psychedelic (psychedelia accepted)"),
-              dollarValue = Some(600)
-            ),
-            JeopardyQuestion(
-              clue = Some("Any of several grouses of the genus Lagopus, having feathered feet"),
-              correctAnswer = Some("a ptarmigan"),
-              dollarValue = Some(800)
-            ),
-            JeopardyQuestion(
-              clue = Some("Also called parrot fever, it can be contracted by handling sick parrots, pigeons or poultry"),
-              correctAnswer = Some("psittacosis"),
-              dollarValue = Some(1000)
-            )
-          )
-        )
-      )
+      categories = game12ValidCategoriesRound1
     ),
     secondRound = JeopardyRound(
       round = Some(JeopardyRounds.SECOND),
@@ -410,6 +428,12 @@ object TestObjects {
           )
         )
       )
+    )
+  )
+
+  lazy val expectedGame12InvalidQ1Object: JeopardyGame = expectedGame12Object.copy(
+    firstRound = expectedGame12Object.firstRound.copy(
+      categories = game12InvalidCategoriesRound1
     )
   )
 }

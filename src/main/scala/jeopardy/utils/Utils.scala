@@ -1,5 +1,8 @@
 package jeopardy.utils
 
+import java.text.{ParseException, SimpleDateFormat}
+import java.time.Instant
+
 import scala.util.matching.Regex
 
 /**
@@ -8,7 +11,7 @@ import scala.util.matching.Regex
 object Utils {
   private val BASE_URL = "http://www.j-archive.com"
   private val BASE_GAME_URL = BASE_URL + "/showgame.php?game_id="
-  private val VALID_GAME_RE: Regex = """.*Show #(\d+) - .*""".r
+  private val VALID_GAME_RE: Regex = """.*Show #(\d+) - (.*)""".r
 
   /**
     * Converts a numerical game ID to a URL for requesting info for that game
@@ -33,7 +36,19 @@ object Utils {
     */
   def parseGameNumberFromTitleString(title: String): Option[String] = {
     title match {
-      case VALID_GAME_RE(showNum) => Some(showNum)
+      case VALID_GAME_RE(showNum, _) => Some(showNum)
+      case _ => None
+    }
+  }
+
+  /**
+    * Gets the date from the title string
+    * @param title the string of the title info of the show, as pulled from the HTML
+    * @return the date the show was aired, if found
+    */
+  def parseDateFromTitleString(title: String): Option[Instant] = {
+    title match {
+      case VALID_GAME_RE(_, dateString) => dateOrNone(dateString)
       case _ => None
     }
   }
@@ -47,7 +62,16 @@ object Utils {
     try {
       Some(str.toInt)
     } catch {
-      case e: NumberFormatException => None
+      case _: NumberFormatException => None
+    }
+  }
+
+  def dateOrNone(str: String): Option[Instant] = {
+    try {
+      val format = new SimpleDateFormat("EEE, MMMMM dd, yyyy")
+      Some(format.parse(str).toInstant)
+    } catch {
+      case _: ParseException => None
     }
   }
 

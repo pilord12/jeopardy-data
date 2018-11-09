@@ -68,5 +68,14 @@ class GameParserSpec extends WordSpec with Matchers {
 
       res shouldBe TestObjects.expectedGame12Object
     }
+
+    "parse a Jeopardy game with an invalid clue" in {
+      val testParser = new GameParser(TestObjects.game12InvalidQ1Html)
+      val res = testParser.parse.get
+
+      res.firstRound.categories(0).questions(0) shouldBe TestObjects.game12InvalidCat1Question
+
+      res shouldBe TestObjects.expectedGame12InvalidQ1Object
+    }
   }
 }
